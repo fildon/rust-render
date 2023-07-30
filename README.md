@@ -2,6 +2,8 @@
 
 A project to compute render animated scenes using Rust compiled to WASM
 
+[Deployed on rupertmckay.com](https://rupertmckay.com/rust-render)
+
 ## Local Development
 
 1. Install project dependencies

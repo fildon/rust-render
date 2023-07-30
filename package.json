@@ -1,11 +1,12 @@
 {
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
+    "build": "webpack --config webpack.prod.js && shx cp favicon.ico dist/favicon.ico",
     "serve": "webpack-dev-server --config webpack.dev.js"
   },
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "1.0.1",
     "html-webpack-plugin": "^3.2.0",
+    "shx": "^0.3.4",
     "text-encoding": "^0.7.0",
     "webpack": "^4.29.4",
     "webpack-cli": "^3.1.1",
