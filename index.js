@@ -1,16 +1,23 @@
-import("./pkg").then(({ render }) => {
+import("./pkg").then(({ render_to_ctx }) => {
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
 
   const paintFrame = (timestamp) => {
-    ctx.clearRect(0, 0, 150, 150);
+    render_to_ctx(ctx, timestamp);
 
-    const x = render(timestamp);
-
-    ctx.fillStyle = "green";
-    ctx.fillRect(0, 0, 150 * x, 150 * x);
     requestAnimationFrame(paintFrame);
   };
 
   requestAnimationFrame(paintFrame);
 });
+
+/**
+ * Given `height` and `width`:
+ * there are `height`*`width`px to write to.
+ * Each px takes 4 values:
+ * - R
+ * - G
+ * - B
+ * - A
+ * Each of those values is 0-255
+ */

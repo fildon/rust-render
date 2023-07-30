@@ -1,6 +1,6 @@
 # Rust Render
 
-A project to compute render animated scenes using Rust compiled to WASM
+A project to render animated scenes using Rust compiled to WASM
 
 [Deployed on rupertmckay.com](https://rupertmckay.com/rust-render)
 
