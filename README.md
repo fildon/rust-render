@@ -25,3 +25,7 @@ A project to render animated scenes using Rust compiled to WASM
    ```
 
 4. Open [localhost](http://localhost:8080/)
+
+## Thanks
+
+Huge thanks to the [wasm-bindgen docs](https://rustwasm.github.io/wasm-bindgen/examples/julia.html) for fantastic documentation and a thorough collection of examples.
