@@ -1,0 +1,15 @@
+[package]
+name = "rust-render"
+version = "0.1.0"
+authors = ["Rupert McKay"]
+edition = "2018"
+description = "A program for computing rending with Rust"
+repository = "https://github.com/fildon/rust-render"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2.74"
+rand = "0.8.5"
+getrandom = { version = "0.2", features = ["js"] }
