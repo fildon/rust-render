@@ -10,14 +10,3 @@ import("./pkg").then(({ render_to_ctx }) => {
 
   requestAnimationFrame(paintFrame);
 });
-
-/**
- * Given `height` and `width`:
- * there are `height`*`width`px to write to.
- * Each px takes 4 values:
- * - R
- * - G
- * - B
- * - A
- * Each of those values is 0-255
- */

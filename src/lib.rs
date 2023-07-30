@@ -15,8 +15,8 @@ pub fn render_to_ctx(ctx: &CanvasRenderingContext2d, timestamp: f64) -> Result<(
     // log(format!("hello {}", timestamp).as_str());
 
     let c = Complex {
-        real: -0.15 + (timestamp / 1000.0).sin() / 10.0,
-        imaginary: 0.65 + (timestamp / 1000.0).cos() / 10.0,
+        real: 0.7885 * (timestamp / 5000.0).sin(),
+        imaginary: 0.7885 * (timestamp / 5000.0).cos(),
     };
     let data = create_image_data(c);
     let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&data), 600, 600)?;
@@ -36,11 +36,11 @@ fn create_image_data(c: Complex) -> Vec<u8> {
                 real: y as f64 * scale - param_r,
                 imaginary: x as f64 * scale - param_i,
             };
-            let iter_index = get_iter_index(z, c) * 20;
-            data.push((iter_index / 4) as u8);
-            data.push((iter_index / 2) as u8);
-            data.push(iter_index as u8);
-            data.push(255);
+            let iter_index = get_iter_index(z, c) * 10;
+            data.push(0); // R
+            data.push(0); // G
+            data.push(iter_index as u8); // B
+            data.push(255); // A
         }
     }
 
@@ -50,14 +50,14 @@ fn create_image_data(c: Complex) -> Vec<u8> {
 fn get_iter_index(z: Complex, c: Complex) -> u32 {
     let mut iter_index: u32 = 0;
     let mut z = z;
-    while iter_index < 20 {
+    while iter_index < 30 {
         if z.norm() > 2.0 {
-            break;
+            return iter_index;
         }
         z = z.square() + c;
         iter_index += 1;
     }
-    iter_index
+    1024
 }
 
 #[derive(Clone, Copy, Debug)]
