@@ -1,8 +1,12 @@
-use std::ops::Add;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::Clamped;
-use web_sys::{CanvasRenderingContext2d, ImageData};
+use web_sys::{window, CanvasRenderingContext2d, ImageData};
 
+/**
+ * Example usage:
+ *
+ * log(format!("hello {}", timestamp).as_str());
+ */
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
@@ -10,81 +14,63 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub fn render_to_ctx(ctx: &CanvasRenderingContext2d, timestamp: f64) -> Result<(), JsValue> {
-    ctx.clear_rect(0.0, 0.0, 600.0, 600.0);
-    // log(format!("hello {}", timestamp).as_str());
+pub fn render(timestamp: f64) {
+    let window_ref = window().unwrap();
+    let screen_height = window_ref.inner_height().unwrap().as_f64().unwrap() as u32;
+    let screen_width = window_ref.inner_width().unwrap().as_f64().unwrap() as u32;
+    let document: web_sys::Document = window_ref.document().unwrap();
+    let canvas: web_sys::HtmlCanvasElement = document
+        .get_element_by_id("canvas")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlCanvasElement>()
+        .map_err(|_| ())
+        .unwrap();
 
-    let c = Complex {
-        real: 0.7885 * (timestamp / 5000.0).sin(),
-        imaginary: 0.7885 * (timestamp / 5000.0).cos(),
-    };
-    let data = create_image_data(c);
-    let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&data), 600, 600)?;
-    ctx.put_image_data(&data, 0.0, 0.0)
+    let context = canvas
+        .get_context("2d")
+        .unwrap()
+        .unwrap()
+        .dyn_into::<CanvasRenderingContext2d>()
+        .unwrap();
+
+    if canvas.height() != screen_height {
+        canvas.set_height(screen_height);
+    }
+    if canvas.width() != screen_width {
+        canvas.set_width(screen_width);
+    }
+
+    let data = create_image_data(timestamp, screen_width, screen_height);
+
+    let data =
+        ImageData::new_with_u8_clamped_array_and_sh(Clamped(&data), screen_width, screen_height)
+            .unwrap();
+    context.put_image_data(&data, 0.0, 0.0).unwrap();
 }
 
-fn create_image_data(c: Complex) -> Vec<u8> {
+fn create_image_data(timestamp: f64, screen_width: u32, screen_height: u32) -> Vec<u8> {
     let mut data = Vec::new();
 
-    let param_i = 1.5;
-    let param_r = 1.5;
-    let scale = 0.005;
+    // Oscillate value between 0-255 integers
+    let component_from_time = ((((timestamp / 1000.0).sin() + 1.0) / 2.0) * 255.0) as u8;
 
-    for x in 0..600 {
-        for y in 0..600 {
-            let z = Complex {
-                real: y as f64 * scale - param_r,
-                imaginary: x as f64 * scale - param_i,
-            };
-            let iter_index = get_iter_index(z, c) * 10;
-            data.push(0); // R
-            data.push(0); // G
-            data.push(iter_index as u8); // B
-            data.push(255); // A
+    // log(format!("hello {}", component_from_time).as_str());
+
+    for y in 0..screen_height {
+        let y_component = ((((f64::from(y) / 50.0).sin() + 1.0) / 2.0) * 255.0) as u8;
+        for x in 0..screen_width {
+            let x_component = ((((f64::from(x) / 50.0).sin() + 1.0) / 2.0) * 255.0) as u8;
+
+            // Red value
+            data.push(x_component);
+            // Green value
+            data.push(y_component);
+            // Blue value
+            data.push(component_from_time as u8);
+            // Alpha value
+            data.push(255);
         }
     }
 
     data
-}
-
-fn get_iter_index(z: Complex, c: Complex) -> u32 {
-    let mut iter_index: u32 = 0;
-    let mut z = z;
-    while iter_index < 30 {
-        if z.norm() > 2.0 {
-            return iter_index;
-        }
-        z = z.square() + c;
-        iter_index += 1;
-    }
-    1024
-}
-
-#[derive(Clone, Copy, Debug)]
-struct Complex {
-    real: f64,
-    imaginary: f64,
-}
-
-impl Complex {
-    fn square(self) -> Complex {
-        let real = (self.real * self.real) - (self.imaginary * self.imaginary);
-        let imaginary = 2.0 * self.real * self.imaginary;
-        Complex { real, imaginary }
-    }
-
-    fn norm(&self) -> f64 {
-        (self.real * self.real) + (self.imaginary * self.imaginary)
-    }
-}
-
-impl Add<Complex> for Complex {
-    type Output = Complex;
-
-    fn add(self, rhs: Complex) -> Complex {
-        Complex {
-            real: self.real + rhs.real,
-            imaginary: self.imaginary + rhs.imaginary,
-        }
-    }
 }

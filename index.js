@@ -1,9 +1,6 @@
-import("./pkg").then(({ render_to_ctx }) => {
-  const canvas = document.querySelector("canvas");
-  const ctx = canvas.getContext("2d");
-
+import("./pkg").then(({ render }) => {
   const paintFrame = (timestamp) => {
-    render_to_ctx(ctx, timestamp);
+    render(timestamp);
 
     requestAnimationFrame(paintFrame);
   };
